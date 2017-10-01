@@ -1,0 +1,141 @@
+<h1 class="page-header">{{ trip.route_short_name }} - {{ trip.trip_start_stop_name }} <span class='glyphicon glyphicon-play'></span> {{ trip.trip_end_stop_name }}</h1>
+
+<div class="row">
+    <div class="col-xs-6">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                <th>Indulási idő</th>
+                <th>Megálló</th>
+                <th>Menetidő (perc)</th>
+                </thead>
+                <tr ng-repeat="stops in trip.trip_stops">
+                    <td>{{ stops.departure_time }}</td>
+                    <td>{{ stops.stop_name }}</td>
+                    <td>{{ stops.travel_time }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div id="map" style="width:100%;height:500px;"></div>
+    </div>
+</div>
+
+<script>
+    function myMap() {
+        var shapePoints = [];
+        var bounds = new google.maps.LatLngBounds();
+        var previousInfowindow = false;
+        $.ready(
+            $.getJSON("/get_trip_shapes",
+                {
+                    //route_short_name: window.location.hash.split('/').slice(-2, -1)[0],
+                    trip_id: window.location.hash.split('/').slice(-1)[0]
+                },
+                function (data) {
+                    $.each(data, function (key, value) {
+                            var latlng = new google.maps.LatLng(value["shape_pt_lat"], value["shape_pt_lon"]);
+                            shapePoints.push(latlng);
+                            bounds.extend(latlng);
+                        }
+                    );
+
+                    var mapCanvas = document.getElementById("map");
+                    /*var mapOptions = {center: amsterdam, zoom: 4};*/
+                    var map = new google.maps.Map(mapCanvas);
+
+                    var endStopName;
+
+                    $.getJSON("/get_trip_terminals_coordinates",
+                        {
+                            //route_short_name: window.location.hash.split('/').slice(-2, -1)[0],
+                            trip_id: window.location.hash.split('/').slice(-1)[0]
+                        },
+                        function (data) {
+                            $.each(data, function (key, value) {
+                                endStopName = value["stop_name"];
+                            });
+                            $.each(data, function (key, value) {
+                                var latlng = new google.maps.LatLng(value["stop_lat"], value["stop_lon"]);
+                                var contentString;
+                                if (value["stop_name"] === endStopName) {
+                                    contentString = value["stop_name"];
+                                }
+                                else {
+                                    contentString = value["stop_name"] + " <span class='glyphicon glyphicon-play'></span> " + endStopName;
+                                }
+                                var infowindow = new google.maps.InfoWindow({
+                                    content: contentString
+                                });
+                                var marker = new google.maps.Marker({
+                                    position: latlng,
+                                    icon: {
+                                        path: google.maps.SymbolPath.CIRCLE,
+                                        strokeColor: '#2cc124',
+                                        fillColor: '#2cc124',
+                                        fillOpacity: 1,
+                                        scale: 7
+                                    },
+                                    map: map,
+                                    title: value["stop_name"]
+                                });
+                                marker.addListener('click', function () {
+                                    if (previousInfowindow) {
+                                        previousInfowindow.close();
+                                    }
+                                    previousInfowindow = infowindow;
+                                    infowindow.open(map, marker);
+                                });
+                            });
+                        }
+                    );
+
+                    $.getJSON("/get_trip_stops_coordinates",
+                        {
+                            //route_short_name: window.location.hash.split('/').slice(-2, -1)[0],
+                            trip_id: window.location.hash.split('/').slice(-1)[0]
+                        },
+                        function (data) {
+                            $.each(data, function (key, value) {
+                                var latlng = new google.maps.LatLng(value["stop_lat"], value["stop_lon"]);
+                                var infowindow = new google.maps.InfoWindow({
+                                    content: value["stop_name"] + " <span class='glyphicon glyphicon-play'></span> " + endStopName
+                                });
+                                var marker = new google.maps.Marker({
+                                    position: latlng,
+                                    icon: {
+                                        path: google.maps.SymbolPath.CIRCLE,
+                                        strokeColor: '#2cc124',
+                                        fillColor: '#FFF',
+                                        fillOpacity: 1,
+                                        scale: 7
+                                    },
+                                    map: map,
+                                    title: value["stop_name"]
+                                });
+                                marker.addListener('click', function () {
+                                    if (previousInfowindow) {
+                                        previousInfowindow.close();
+                                    }
+                                    previousInfowindow = infowindow;
+                                    infowindow.open(map, marker);
+                                });
+                            });
+                        }
+                    );
+
+                    var flightPath = new google.maps.Polyline({
+                        path: shapePoints,
+                        strokeColor: "#2cc124",
+                        strokeOpacity: 0.8,
+                        strokeWeight: 4
+                    });
+                    flightPath.setMap(map);
+
+                    map.fitBounds(bounds);
+                }));
+    }
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYjOqnpwud-wms3TW1w4WA6ZGDmSpe3n8&callback=myMap"></script>

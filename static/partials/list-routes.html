@@ -1,0 +1,105 @@
+ <h1 class="page-header">Járatok</h1>
+<div class="row">
+    <div ng-repeat="route in tram_routes">
+        <a href="#/schedule/{{ route.route_short_name }}/0"
+           class="btn btn-warning col-xs-1">{{ route.route_short_name }}</a>
+    </div>
+    <div ng-repeat="route in bus_routes">
+        <a href="#/schedule/{{ route.route_short_name }}/0"
+           class="btn btn-success col-xs-1">{{ route.route_short_name }}</a>
+    </div>
+</div>
+
+<div class="row">
+    <h2>Villamosvonalak
+        <div class="col-lg-3 pull-right">
+            <div class="input-group input-group-unstyled">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                <input type="search" id="search" value="" class="form-control" placeholder="Keresés"
+                       ng-model="tramTableQuery">
+            </div>
+        </div>
+    </h2>
+</div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th ng-click="tramTableOrderByName()">Vonalszám
+                <span class="glyphicon glyphicon-triangle-bottom"
+                      ng-show="tramTableOrderBy == '+route_short_name'"></span>
+                <span class="glyphicon glyphicon-triangle-top"
+                      ng-show="tramTableOrderBy == '-route_short_name'"></span>
+            </th>
+            <th ng-click="tramTableOrderByStart()">Induló állomás
+                <span class="glyphicon glyphicon-triangle-bottom"
+                      ng-show="tramTableOrderBy == '+route_start_stop_name'"></span>
+                <span class="glyphicon glyphicon-triangle-top"
+                      ng-show="tramTableOrderBy == '-route_start_stop_name'"></span>
+            </th>
+            <th ng-click="tramTableOrderByEnd()">Érkező állomás
+                <span class="glyphicon glyphicon-triangle-bottom"
+                      ng-show="tramTableOrderBy == '+route_end_stop_name'"></span>
+                <span class="glyphicon glyphicon-triangle-top"
+                      ng-show="tramTableOrderBy == '-route_end_stop_name'"></span>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="route in tram_routes | orderBy: tramTableOrderBy | filter: tramTableSearch">
+            <td>{{ route.route_short_name }}</td>
+            <td><a href="#/schedule/{{ route.route_short_name }}/0">{{ route.route_start_stop_name }}</a></td>
+            <td><a href="#/schedule/{{ route.route_short_name }}/1">{{ route.route_end_stop_name }}</a></td>
+        </tr>
+        </tbody>
+    </table>
+    <p ng-show="(tram_routes | filter:tramTableSearch).length == 0" class="text-center alert alert-info"><strong>Nincs a
+        keresési feltételnek megfelelő találat!</strong></p>
+</div>
+
+
+<div class="row">
+    <h2>Autóbuszvonalak
+        <div class="col-lg-3 pull-right">
+            <div class="input-group input-group-unstyled">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                <input type="search" id="search" value="" class="form-control" placeholder="Keresés"
+                       ng-model="busTableQuery">
+            </div>
+        </div>
+    </h2>
+</div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th ng-click="busTableOrderByName()">Vonalszám
+                <span class="glyphicon glyphicon-triangle-bottom"
+                      ng-show="busTableOrderBy == '+route_short_name'"></span>
+                <span class="glyphicon glyphicon-triangle-top" ng-show="busTableOrderBy == '-route_short_name'"></span>
+            </th>
+            <th ng-click="busTableOrderByStart()">Induló állomás
+                <span class="glyphicon glyphicon-triangle-bottom"
+                      ng-show="busTableOrderBy == '+route_start_stop_name'"></span>
+                <span class="glyphicon glyphicon-triangle-top"
+                      ng-show="busTableOrderBy == '-route_start_stop_name'"></span>
+            </th>
+            <th ng-click="busTableOrderByEnd()">Érkező állomás
+                <span class="glyphicon glyphicon-triangle-bottom"
+                      ng-show="busTableOrderBy == '+route_end_stop_name'"></span>
+                <span class="glyphicon glyphicon-triangle-top"
+                      ng-show="busTableOrderBy == '-route_end_stop_name'"></span>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="route in bus_routes | orderBy: busTableOrderBy | filter: busTableSearch">
+            <td>{{ route.route_short_name }}</td>
+            <td><a href="#/schedule/{{ route.route_short_name }}/0">{{ route.route_start_stop_name }}</a></td>
+            <td><a href="#/schedule/{{ route.route_short_name }}/1">{{ route.route_end_stop_name }}</a></td>
+        </tr>
+        </tbody>
+    </table>
+    <p ng-show="(bus_routes | filter:busTableSearch).length == 0" class="text-center alert alert-info"><strong>Nincs a
+        keresési feltételnek megfelelő találat!</strong></p>
+</div>
