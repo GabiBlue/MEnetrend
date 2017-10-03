@@ -1,12 +1,17 @@
- <h1 class="page-header">Járatok</h1>
+<h1 class="page-header">Járatok</h1>
 <div class="row">
-    <div ng-repeat="route in tram_routes">
-        <a href="#/schedule/{{ route.route_short_name }}/0"
-           class="btn btn-warning col-xs-1">{{ route.route_short_name }}</a>
+    <div ng-show="loading">
+        <img src="/static/images/spinner.gif" class="img-responsive center-block">
     </div>
-    <div ng-repeat="route in bus_routes">
-        <a href="#/schedule/{{ route.route_short_name }}/0"
-           class="btn btn-success col-xs-1">{{ route.route_short_name }}</a>
+    <div ng-show="!loading">
+        <div ng-repeat="route in tram_routes">
+            <a href="#/schedule/{{ route.route_short_name }}/0"
+               class="btn btn-warning col-xs-1">{{ route.route_short_name }}</a>
+        </div>
+        <div ng-repeat="route in bus_routes">
+            <a href="#/schedule/{{ route.route_short_name }}/0"
+               class="btn btn-success col-xs-1">{{ route.route_short_name }}</a>
+        </div>
     </div>
 </div>
 
@@ -46,11 +51,16 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="route in tram_routes | orderBy: tramTableOrderBy | filter: tramTableSearch">
-            <td>{{ route.route_short_name }}</td>
-            <td><a href="#/schedule/{{ route.route_short_name }}/0">{{ route.route_start_stop_name }}</a></td>
-            <td><a href="#/schedule/{{ route.route_short_name }}/1">{{ route.route_end_stop_name }}</a></td>
-        </tr>
+        <div ng-show="loading">
+            <img src="/static/images/spinner.gif" class="img-responsive center-block">
+        </div>
+        <div ng-show="!loading">
+            <tr ng-repeat="route in tram_routes | orderBy: tramTableOrderBy | filter: tramTableSearch">
+                <td>{{ route.route_short_name }}</td>
+                <td><a href="#/schedule/{{ route.route_short_name }}/0">{{ route.route_start_stop_name }}</a></td>
+                <td><a href="#/schedule/{{ route.route_short_name }}/1">{{ route.route_end_stop_name }}</a></td>
+            </tr>
+        </div>
         </tbody>
     </table>
     <p ng-show="(tram_routes | filter:tramTableSearch).length == 0" class="text-center alert alert-info"><strong>Nincs a
@@ -93,11 +103,16 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="route in bus_routes | orderBy: busTableOrderBy | filter: busTableSearch">
-            <td>{{ route.route_short_name }}</td>
-            <td><a href="#/schedule/{{ route.route_short_name }}/0">{{ route.route_start_stop_name }}</a></td>
-            <td><a href="#/schedule/{{ route.route_short_name }}/1">{{ route.route_end_stop_name }}</a></td>
-        </tr>
+        <div ng-show="loading">
+            <img src="/static/images/spinner.gif" class="img-responsive center-block">
+        </div>
+        <div ng-show="!loading">
+            <tr ng-repeat="route in bus_routes | orderBy: busTableOrderBy | filter: busTableSearch">
+                <td>{{ route.route_short_name }}</td>
+                <td><a href="#/schedule/{{ route.route_short_name }}/0">{{ route.route_start_stop_name }}</a></td>
+                <td><a href="#/schedule/{{ route.route_short_name }}/1">{{ route.route_end_stop_name }}</a></td>
+            </tr>
+        </div>
         </tbody>
     </table>
     <p ng-show="(bus_routes | filter:busTableSearch).length == 0" class="text-center alert alert-info"><strong>Nincs a

@@ -35,13 +35,19 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 
 
 app.controller("listRoutesController", function ($scope, $http, $state, $stateParams) {
-    $http.get("/get_bus_routes").then(function (response) {
-        $scope.bus_routes = response.data;
-
-    });
+    $scope.loading = true;
     $http.get("/get_tram_routes").then(function (response) {
         $scope.tram_routes = response.data;
     });
+
+    $http.get("/get_bus_routes").then(function (response) {
+        $scope.bus_routes = response.data;
+
+    })
+        .finally(function () {
+            $scope.loading = false;
+        });
+
 
     $scope.busTableOrderBy = "+route_short_name";
     $scope.busTableOrderByName = function () {
