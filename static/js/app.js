@@ -22,19 +22,19 @@ app.config(function ($stateProvider, $urlRouterProvider) {
             templateUrl: "/static/partials/trip.html",
             controller: "tripController"
         })
-        .state("/error-404", {
-            url: "/error-404",
-            templateUrl: "/static/partials/error-404.html"
-        })
         .state("/schedule", {
             url: "/schedule/:route_short_name/{direction_id:int}",
             templateUrl: "/static/partials/schedule.html",
             controller: "scheduleController"
         })
+        .state("/error-404", {
+            url: "/error-404",
+            templateUrl: "/static/partials/error-404.html"
+        })
 });
 
 
-app.controller("listRoutesController", function ($scope, $http, $state, $stateParams) {
+app.controller("listRoutesController", function ($scope, $http) {
     $scope.loading = true;
     $http.get("/get_tram_routes").then(function (response) {
         $scope.tram_routes = response.data;
@@ -42,11 +42,9 @@ app.controller("listRoutesController", function ($scope, $http, $state, $statePa
 
     $http.get("/get_bus_routes").then(function (response) {
         $scope.bus_routes = response.data;
-
-    })
-        .finally(function () {
-            $scope.loading = false;
-        });
+    }).finally(function () {
+        $scope.loading = false;
+    });
 
 
     $scope.busTableOrderBy = "+route_short_name";
@@ -55,7 +53,7 @@ app.controller("listRoutesController", function ($scope, $http, $state, $statePa
             $scope.busTableOrderBy = "-route_short_name";
         }
         else {
-            $scope.busTableOrderBy = "+route_short_name"
+            $scope.busTableOrderBy = "+route_short_name";
         }
     };
     $scope.busTableOrderByStart = function () {
@@ -63,7 +61,7 @@ app.controller("listRoutesController", function ($scope, $http, $state, $statePa
             $scope.busTableOrderBy = "-route_start_stop_name";
         }
         else {
-            $scope.busTableOrderBy = "+route_start_stop_name"
+            $scope.busTableOrderBy = "+route_start_stop_name";
         }
     };
     $scope.busTableOrderByEnd = function () {
@@ -71,7 +69,7 @@ app.controller("listRoutesController", function ($scope, $http, $state, $statePa
             $scope.busTableOrderBy = "-route_end_stop_name";
         }
         else {
-            $scope.busTableOrderBy = "+route_end_stop_name"
+            $scope.busTableOrderBy = "+route_end_stop_name";
         }
     };
 
@@ -87,7 +85,7 @@ app.controller("listRoutesController", function ($scope, $http, $state, $statePa
             $scope.tramTableOrderBy = "-route_short_name";
         }
         else {
-            $scope.tramTableOrderBy = "+route_short_name"
+            $scope.tramTableOrderBy = "+route_short_name";
         }
     };
     $scope.tramTableOrderByStart = function () {
@@ -95,7 +93,7 @@ app.controller("listRoutesController", function ($scope, $http, $state, $statePa
             $scope.tramTableOrderBy = "-route_start_stop_name";
         }
         else {
-            $scope.tramTableOrderBy = "+route_start_stop_name"
+            $scope.tramTableOrderBy = "+route_start_stop_name";
         }
     };
     $scope.tramTableOrderByEnd = function () {
@@ -103,7 +101,7 @@ app.controller("listRoutesController", function ($scope, $http, $state, $statePa
             $scope.tramTableOrderBy = "-route_end_stop_name";
         }
         else {
-            $scope.tramTableOrderBy = "+route_end_stop_name"
+            $scope.tramTableOrderBy = "+route_end_stop_name";
         }
     };
 
@@ -121,8 +119,8 @@ app.controller("tripController", function ($scope, $http, $state, $stateParams) 
     }).then(function (response) {
             $scope.trip = response.data;
         },
-        function (response) {
-            $state.go("/error-404")
+        function () {
+            $state.go("/error-404");
         }
     );
 

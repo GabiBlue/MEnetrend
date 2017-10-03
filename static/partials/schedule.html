@@ -1,5 +1,7 @@
-<h1 class="page-header">{{ trips.route_short_name }} - {{ trips.trip_start_stop_name }} <span
-        class='glyphicon glyphicon-play'></span> {{ trips.trip_end_stop_name }} <br>{{ trips.date }}</h1>
+<h1 class="page-header">
+    {{ trips.route_short_name }} &#8212; {{ trips.trip_start_stop_name }} <span class='glyphicon glyphicon-play'></span>
+    {{ trips.trip_end_stop_name }} <br>{{ trips.date }}
+</h1>
 
 <div class="row">
     <div class="col-sm-6">
@@ -18,8 +20,9 @@
                         <td>
                             <span ng-show="data.length == 0">--</span>
                             <span ng-repeat="i in data">
-                            <a href="#/trip/{{ i.trip_id }}">{{ i.trip_start_time }}</a><span ng-show="!$last">, </span>
-                        </span>
+                                <a href="#/trip/{{ i.trip_id }}">{{ i.trip_start_time }}</a><span
+                                    ng-show="!$last">, </span>
+                            </span>
                         </td>
                     </tr>
                     </tbody>
@@ -32,17 +35,17 @@
     </div>
 
     <div class="col-sm-4">
-        <div class="alert alert-info">Jelenleg a kiválasztott járat {{ trips.date }} napi menetrendjét látja. Ha egy másik napra kíváncsi, válasszon a listából.</div>
-        <div class="input-group">
-            <select class="form-control" ng-model="selectedDate" ng-options="date for date in dates">
-            </select>
+        <div class="alert alert-info">Jelenleg a kiválasztott járat <strong>{{ trips.date }}</strong> napi menetrendjét
+            látja. Ha egy másik napra kíváncsi, válasszon a listából.
+        </div>
 
+        <div class="input-group">
+            <select class="form-control" ng-model="selectedDate" ng-options="date for date in dates"></select>
             <span class="input-group-btn">
-        <button type="button" ng-click="changeDate(selectedDate)" class="btn btn-default"><i
-                class="glyphicon glyphicon-search"></i>
-            Keresés
-        </button>
-        </span>
+                <button type="button" ng-click="changeDate(selectedDate)" class="btn btn-default">
+                    <i class="glyphicon glyphicon-search"></i> Keresés
+                </button>
+            </span>
         </div>
     </div>
 </div>

@@ -64,7 +64,6 @@ def get_start_times():
         response = Response(status=404)
         return response
 
-    # test_route_short_name = session.query(Route).filter(Route.route_short_name == route_short_name).first()
     test_route_short_name = session.query(Trip).join(Trip.route).filter(
         Route.route_short_name == route_short_name).filter(Trip.direction_id == direction_id).first()
 
@@ -112,12 +111,6 @@ def get_dates():
 def get_trip_stops():
     trip_id = request.args.get('trip_id')
 
-    """
-    if route_short_name == '' or int(direction_id) not in [0, 1]:
-        response = Response(status=400)
-        return response
-    """
-
     trip = session.query(Trip).filter(Trip.trip_id == trip_id).first()
 
     if trip is None:
@@ -126,7 +119,6 @@ def get_trip_stops():
 
     trip_dict = {'route_short_name': trip.route.route_short_name, 'trip_start_stop_name': trip.start_stop.stop_name,
                  'trip_end_stop_name': trip.end_stop.stop_name}
-    # trip_stops = [{'stop_name': i.stop.stop_name, 'arrival_time': i.arrival_time} for i in trip.stop_times]
     trip_stops = []
     trip_start_time = datetime.strptime(trip.start_time, '%H:%M:%S')
     for i in trip.stop_times:
@@ -151,12 +143,6 @@ def get_trip_stops():
 def get_trip_shapes():
     trip_id = request.args.get('trip_id')
 
-    """
-    if route_short_name == '' or direction_id == '':
-        response = Response(status=400)
-        return response
-    """
-
     trip = session.query(Trip).filter(Trip.trip_id == trip_id).first()
 
     if trip is None:
@@ -173,12 +159,6 @@ def get_trip_shapes():
 @app.route('/get_trip_stops_coordinates', methods=['GET'])
 def get_trip_stops_coordinates():
     trip_id = request.args.get('trip_id')
-
-    """
-    if route_short_name == '' or direction_id == '':
-        response = Response(status=400)
-        return response
-    """
 
     trip = session.query(Trip).filter(Trip.trip_id == trip_id).first()
 
@@ -199,12 +179,6 @@ def get_trip_stops_coordinates():
 @app.route('/get_trip_terminals_coordinates', methods=['GET'])
 def get_trip_terminals_coordinates():
     trip_id = request.args.get('trip_id')
-
-    """
-    if route_short_name == '' or direction_id == '':
-        response = Response(status=400)
-        return response
-    """
 
     trip = session.query(Trip).filter(Trip.trip_id == trip_id).first()
 

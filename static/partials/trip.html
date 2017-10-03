@@ -1,13 +1,18 @@
-<h1 class="page-header">{{ trip.route_short_name }} - {{ trip.trip_start_stop_name }} <span class='glyphicon glyphicon-play'></span> {{ trip.trip_end_stop_name }}</h1>
+<h1 class="page-header">
+    {{ trip.route_short_name }} &#8212; {{ trip.trip_start_stop_name }}<span class='glyphicon glyphicon-play'></span>
+    {{ trip.trip_end_stop_name }}
+</h1>
 
 <div class="row">
     <div class="col-xs-6">
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead>
-                <th>Indulási idő</th>
-                <th>Megálló</th>
-                <th>Menetidő (perc)</th>
+                <tr>
+                    <th>Indulási idő</th>
+                    <th>Megálló</th>
+                    <th>Menetidő (perc)</th>
+                </tr>
                 </thead>
                 <tr ng-repeat="stops in trip.trip_stops">
                     <td>{{ stops.departure_time }}</td>
@@ -30,7 +35,6 @@
         $.ready(
             $.getJSON("/get_trip_shapes",
                 {
-                    //route_short_name: window.location.hash.split('/').slice(-2, -1)[0],
                     trip_id: window.location.hash.split('/').slice(-1)[0]
                 },
                 function (data) {
@@ -42,14 +46,12 @@
                     );
 
                     var mapCanvas = document.getElementById("map");
-                    /*var mapOptions = {center: amsterdam, zoom: 4};*/
                     var map = new google.maps.Map(mapCanvas);
 
                     var endStopName;
 
                     $.getJSON("/get_trip_terminals_coordinates",
                         {
-                            //route_short_name: window.location.hash.split('/').slice(-2, -1)[0],
                             trip_id: window.location.hash.split('/').slice(-1)[0]
                         },
                         function (data) {
@@ -93,7 +95,6 @@
 
                     $.getJSON("/get_trip_stops_coordinates",
                         {
-                            //route_short_name: window.location.hash.split('/').slice(-2, -1)[0],
                             trip_id: window.location.hash.split('/').slice(-1)[0]
                         },
                         function (data) {
