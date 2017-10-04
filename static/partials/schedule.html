@@ -2,6 +2,11 @@
     {{ trips.route_short_name }} &#8212; {{ trips.trip_start_stop_name }} <span class='glyphicon glyphicon-play'></span>
     {{ trips.trip_end_stop_name }} <br>{{ trips.date }}
 </h1>
+<h3>
+    <span class="glyphicon glyphicon-sort"></span>
+    <a ng-show="direction_id === 0" href="#/schedule/{{ route_short_name }}/1">másik irány</a>
+    <a ng-show="direction_id === 1" href="#/schedule/{{ route_short_name }}/0">másik irány</a>
+</h3>
 
 <div class="row">
     <div class="col-sm-6">

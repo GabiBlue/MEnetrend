@@ -144,6 +144,9 @@ app.controller("scheduleController", function ($scope, $http, $state, $statePara
 
     $scope.selectedDate = dateString;
 
+    $scope.route_short_name = $stateParams.route_short_name;
+    $scope.direction_id = $stateParams.direction_id;
+
     $http.get("/get_start_times", {
         params: {
             route_short_name: $stateParams.route_short_name,
