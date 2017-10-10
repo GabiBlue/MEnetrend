@@ -1,7 +1,7 @@
 /**
  * Created by Javora Gabor on 2017. 09. 05..
  */
-var app = angular.module("MEnetrend", ["ui.router"]);
+var app = angular.module("MEnetrend", ["ui.router", "ui.bootstrap"]);
 
 app.config(function ($stateProvider, $urlRouterProvider) {
 
@@ -26,6 +26,11 @@ app.config(function ($stateProvider, $urlRouterProvider) {
             url: "/schedule/:route_short_name/{direction_id:int}",
             templateUrl: "/static/partials/schedule.html",
             controller: "scheduleController"
+        })
+        .state("/tripPlanner", {
+            url: "/trip-planner",
+            templateUrl: "/static/partials/trip-planner.html",
+            controller: "tripPlannerController"
         })
         .state("/error-404", {
             url: "/error-404",
@@ -188,4 +193,26 @@ app.controller("scheduleController", function ($scope, $http, $state, $statePara
         );
     };
 
+});
+
+app.controller("tripPlannerController", function ($scope, $http) {
+    $http.get("/get_all_stops").then(function (response) {
+        $scope.stops = response.data;
+        console.log($scope.stops);
+    });
+
+    $http.get("/get_dates").then(function (response) {
+        $scope.dates = response.data;
+    });
+
+    var date = new Date();
+    var dateString = date.getFullYear() + '-'
+        + ('0' + (date.getMonth() + 1)).slice(-2) + '-'
+        + ('0' + date.getDate()).slice(-2);
+
+    //var timeString = date.getHours() + ':' + date.getMinutes();
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    $scope.selectedDate = dateString;
+    $scope.selectedTime = date;
 });

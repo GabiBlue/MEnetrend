@@ -3,6 +3,7 @@ from gtfsdb.model.route import Route
 from gtfsdb.model.trip import Trip
 from gtfsdb.model.shape import Shape
 from gtfsdb.model.calendar import UniversalCalendar
+from gtfsdb.model.stop import Stop
 from datetime import datetime
 from app import app, session
 
@@ -193,6 +194,15 @@ def get_trip_terminals_coordinates():
          'stop_lon': str(trip.end_stop.stop_lon)}]
 
     response = Response(response=json.dumps(trip_terminals_coordinates), status=200, mimetype='application/json')
+    return response
+
+
+@app.route('/get_all_stops', methods=['GET'])
+def get_all_stops():
+    stops_result = session.query(Stop).group_by(Stop.stop_name).all()
+    stops = [i.to_dict() for i in stops_result]
+
+    response = Response(response=json.dumps(stops), status=200, mimetype='application/json')
     return response
 
 
