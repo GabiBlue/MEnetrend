@@ -72,7 +72,7 @@ class StopTime(Base):
                 d = self.trip.route.directions[self.trip.direction_id]
                 if d.direction_name and not any([d.direction_name in s for s in banned]):
                     ret_val = d.direction_name.lstrip('to ').lstrip('To ')
-        except Exception, e:
+        except Exception as e:
             log.debug(e)
             pass
         return ret_val

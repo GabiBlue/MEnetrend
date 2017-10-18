@@ -1,4 +1,4 @@
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 import logging.config
 import os
 from pkg_resources import resource_filename  # @UnresolvedImport
