@@ -3,7 +3,7 @@ import logging
 import shutil
 import tempfile
 import time
-from urllib import urlretrieve
+from urllib.request import urlretrieve
 import zipfile
 
 from gtfsdb import config
@@ -50,6 +50,6 @@ class GTFS(object):
         try:
             with closing(zipfile.ZipFile(self.local_file)) as z:
                 z.extractall(path)
-        except Exception, e:
+        except Exception as e:
             log.warning(e)
         return path

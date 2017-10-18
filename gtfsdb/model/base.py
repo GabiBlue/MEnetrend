@@ -30,7 +30,7 @@ class _Base(object):
         from sqlalchemy.orm import deferred 
         try:
             cls.__mapper__.add_property('geom', deferred(cls.__table__.c.geom))
-        except Exception, e:
+        except Exception as e:
             log.warn(e)
 
     @classmethod
@@ -155,7 +155,7 @@ class _Base(object):
     @classmethod
     def make_record(cls, row):
         for k, v in row.items():
-            if isinstance(v, basestring):
+            if isinstance(v, str):
                 row[k] = v.strip()
 
             try:
@@ -168,7 +168,7 @@ class _Base(object):
                         row[k] = datetime.datetime.strptime(v, '%Y%m%d').date()
                 else:
                     log.info("I've got issues with your GTFS {0} data.  I'll continue, but expect more errors...".format(cls.__name__))
-            except Exception, e:
+            except Exception as e:
                 log.warning(e)
 
         """if this is a geospatially enabled database, add a geom"""

@@ -257,7 +257,7 @@ class RouteStop(Base):
                                     else:
                                         unique_stops.append(st.stop_id)
 
-                print unique_stops
+                print(unique_stops)
 
                 # PART B: add records to the database ...
                 if len(unique_stops) > 0:
