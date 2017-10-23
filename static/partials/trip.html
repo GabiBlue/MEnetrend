@@ -28,7 +28,7 @@
 </div>
 
 <script>
-    function myMap() {
+    function drawMap() {
         var shapePoints = [];
         var bounds = new google.maps.LatLngBounds();
         var previousInfowindow = false;
@@ -126,17 +126,17 @@
                         }
                     );
 
-                    var flightPath = new google.maps.Polyline({
+                    var tripPath = new google.maps.Polyline({
                         path: shapePoints,
                         strokeColor: "#2cc124",
                         strokeOpacity: 0.8,
                         strokeWeight: 4
                     });
-                    flightPath.setMap(map);
+                    tripPath.setMap(map);
 
                     map.fitBounds(bounds);
                 }));
     }
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYjOqnpwud-wms3TW1w4WA6ZGDmSpe3n8&callback=myMap"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYjOqnpwud-wms3TW1w4WA6ZGDmSpe3n8&callback=drawMap"></script>
