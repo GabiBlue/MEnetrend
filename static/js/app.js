@@ -196,9 +196,10 @@ app.controller("scheduleController", function ($scope, $http, $state, $statePara
 });
 
 app.controller("tripPlannerController", function ($scope, $http) {
+    $scope.emptyFields = false;
+
     $http.get("/get_all_stops").then(function (response) {
         $scope.stops = response.data;
-        console.log($scope.stops);
     });
 
     $http.get("/get_dates").then(function (response) {
@@ -213,6 +214,27 @@ app.controller("tripPlannerController", function ($scope, $http) {
     //var timeString = date.getHours() + ':' + date.getMinutes();
     date.setSeconds(0);
     date.setMilliseconds(0);
+    $scope.selectedOption = "Indulás most";
     $scope.selectedDate = dateString;
     $scope.selectedTime = date;
+
+    $scope.planTrip = function (from, to, selectedOption, selectedDate, selectedTime) {
+        if (from != null && to != null) {
+            $scope.emptyFields = false;
+            $http.post("/plan_trip", {
+                'from': from,
+                'to': to,
+                'selectedOption': selectedOption,
+                'selectedDate': selectedDate,
+                'selectedTime': selectedTime
+            }).then(function (response) {
+                console.log(response);
+                $scope.plannedTrip = response.data;
+            });
+
+        }
+        else {
+            $scope.emptyFields = true;
+        }
+    }
 });

@@ -57,11 +57,11 @@ def db_connect_tester():
     args, kwargs = get_args()
     db = Database(**kwargs)
     for s in db.session.query(Stop).limit(2):
-        print s.stop_name
+        print(s.stop_name)
     for r in db.session.query(Route).limit(2):
-        print r.route_name
+        print(r.route_name)
     #import pdb; pdb.set_trace()
     stop_times = StopTime.get_departure_schedule(db.session, stop_id='11411')
     for st in stop_times:
-        print st.get_direction_name()
+        print(st.get_direction_name())
         break
