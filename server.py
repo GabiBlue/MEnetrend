@@ -218,7 +218,7 @@ def plan_trip():
     log.debug(request_data['from'])
     path, cost = dijkstra(graph, {'name': request_data['from'], 'route': None}, request_data['to'], visited=[],
                           distances={}, predecessors={})
-    response = Response(response=json.dumps(path[::-1]), status=200, mimetype='application/json')
+    response = Response(response=json.dumps(path), status=200, mimetype='application/json')
     return response
 
 

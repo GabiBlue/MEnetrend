@@ -19,7 +19,7 @@ def dijkstra(graph, src, dest, visited=[], distances={}, predecessors={}):
             if i['route'] == path[-2]['route']:
                 path[-1]['route'] = path[-2]['route']
 
-        return path, distances[dest]
+        return path[::-1], distances[dest]
     else:
         # if it is the initial  run, initializes the cost
         if not visited:
