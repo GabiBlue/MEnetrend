@@ -48,4 +48,5 @@ def dijkstra(graph, src, dest, visited=[], distances={}, predecessors={}):
         min_value = min(unvisited.values(), key=lambda x: x['cost'])
         min_name = min(unvisited.keys(), key=lambda x: unvisited[x]['cost'])
         new_src = {'name': min_name, 'route': min_value['route']}
+
         return dijkstra(graph, new_src, dest, visited, distances, predecessors)

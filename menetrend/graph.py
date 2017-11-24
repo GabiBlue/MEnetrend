@@ -36,4 +36,5 @@ def generate_graph():
 
                         graph[stop_time.stop.stop_name].append({'name': j.stop_times[index + 1].stop.stop_name, 'cost':(
                             next_departure_time - current_departure_time).total_seconds(), 'route': j.route.route_short_name})
+
     return graph

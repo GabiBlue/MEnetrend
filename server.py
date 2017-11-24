@@ -1,21 +1,14 @@
 from flask import send_file, Response, request, url_for, redirect
+from app import app
 
-from gtfsdb.model.route import Route
-from gtfsdb.model.trip import Trip
-from gtfsdb.model.shape import Shape
-from gtfsdb.model.calendar import UniversalCalendar
-from gtfsdb.model.stop import Stop
+from menetrend.graph import *
+from menetrend.trip_planner import *
+from menetrend.routes import *
+from menetrend.schedule import *
+from menetrend.trips import *
+from menetrend.stops import *
 
-from datetime import datetime
-from app import app, session
-
-from menetrend.graph import generate_graph
-from menetrend.trip_planner import dijkstra
-
-import logging
 import json
-
-log = logging.getLogger(__name__)
 
 
 @app.route('/favicon.ico', methods=['GET'])
@@ -30,15 +23,7 @@ def index():
 
 @app.route('/get_bus_routes', methods=['GET'])
 def get_bus_routes():
-    bus_routes_result = session.query(Route).filter(Route.route_type == 3).order_by(Route.route_short_name)
-    bus_routes = []
-    for i in bus_routes_result:
-        for j in i.trips:
-            if j.direction_id == 0:
-                bus_routes.append(
-                    {'route_short_name': i.route_short_name, 'route_start_stop_name': j.start_stop.stop_name,
-                     'route_end_stop_name': j.end_stop.stop_name})
-                break
+    bus_routes = query_routes_by_route_type(3)
 
     response = Response(response=json.dumps(bus_routes), status=200, mimetype='application/json')
     return response
@@ -46,15 +31,7 @@ def get_bus_routes():
 
 @app.route('/get_tram_routes', methods=['GET'])
 def get_tram_routes():
-    tram_routes_result = session.query(Route).filter(Route.route_type == 0).order_by(Route.route_short_name)
-    tram_routes = []
-    for i in tram_routes_result:
-        for j in i.trips:
-            if j.direction_id == 0:
-                tram_routes.append(
-                    {'route_short_name': i.route_short_name, 'route_start_stop_name': j.start_stop.stop_name,
-                     'route_end_stop_name': j.end_stop.stop_name})
-                break
+    tram_routes = query_routes_by_route_type(0)
 
     response = Response(response=json.dumps(tram_routes), status=200, mimetype='application/json')
     return response
@@ -70,45 +47,28 @@ def get_start_times():
         response = Response(status=404)
         return response
 
-    test_route_short_name = session.query(Trip).join(Trip.route).filter(
-        Route.route_short_name == route_short_name).filter(Trip.direction_id == direction_id).first()
+    trip = test_route_short_name(route_short_name, direction_id)
 
-    if test_route_short_name is None:
+    if trip is None:
         response = Response(status=404)
         return response
 
-    trips = session.query(Trip).join(Trip.route).join(UniversalCalendar,
-                                                      Trip.service_id == UniversalCalendar.service_id).filter(
-        Route.route_short_name == route_short_name).filter(Trip.direction_id == direction_id).filter(
-        UniversalCalendar.date == date).all()
-
-    trips_dict = {'route_short_name': test_route_short_name.route.route_short_name,
-                  'trip_start_stop_name': test_route_short_name.start_stop.stop_name,
-                  'trip_end_stop_name': test_route_short_name.end_stop.stop_name,
-                  'date': date}
+    trips, trips_dict = query_trips_schedule(route_short_name, direction_id, date, trip)
 
     if not trips:
         response = Response(response=json.dumps(trips_dict), status=400)
         return response
 
-    hours = [x for x in range(24)]
-    hours_dict = {el: [] for el in hours}
+    scheduled_trips_dict = generate_schedule_dictionary(trips, trips_dict)
 
-    for i in trips:
-        start_time = datetime.strptime(i.start_time, '%H:%M:%S')
-        hours_dict[start_time.hour].append(
-            {'trip_id': i.trip_id, 'trip_start_time': '{0:02}'.format(start_time.minute)})
-
-    trips_dict['hours'] = hours_dict
-
-    response = Response(response=json.dumps(trips_dict), status=200, mimetype='application/json')
+    response = Response(response=json.dumps(scheduled_trips_dict), status=200, mimetype='application/json')
     return response
 
 
 @app.route('/get_dates', methods=['GET'])
 def get_dates():
-    dates_result = session.query(UniversalCalendar.date).distinct().order_by(UniversalCalendar.date)
-    dates = [str(date[0]) for date in dates_result]
+    dates = query_dates()
+
     response = Response(response=json.dumps(dates), status=200, mimetype='application/json')
     return response
 
@@ -116,30 +76,13 @@ def get_dates():
 @app.route('/get_trip_stops', methods=['GET'])
 def get_trip_stops():
     trip_id = request.args.get('trip_id')
-
-    trip = session.query(Trip).filter(Trip.trip_id == trip_id).first()
+    trip = test_trip(trip_id)
 
     if trip is None:
         response = Response(status=400)
         return response
 
-    trip_dict = {'route_short_name': trip.route.route_short_name, 'trip_start_stop_name': trip.start_stop.stop_name,
-                 'trip_end_stop_name': trip.end_stop.stop_name}
-    trip_stops = []
-    trip_start_time = datetime.strptime(trip.start_time, '%H:%M:%S')
-    for i in trip.stop_times:
-        try:
-            departure_time = datetime.strptime(i.departure_time, '%H:%M:%S')
-        except ValueError:
-            departure_time = i.departure_time.replace('24', '0', 1)
-            departure_time = datetime.strptime(departure_time, "%H:%M:%S")
-        seconds = (departure_time - trip_start_time).total_seconds()
-        trip_stops.append({'stop_name': i.stop.stop_name,
-                           'departure_time': '{0:02}:{1:02}:{2:02}'.format(departure_time.hour, departure_time.minute,
-                                                                           departure_time.second),
-                           'travel_time': (seconds % 3600) // 60})
-
-    trip_dict['trip_stops'] = trip_stops
+    trip_dict = query_trip_stops(trip)
 
     response = Response(response=json.dumps(trip_dict), status=200, mimetype='application/json')
     return response
@@ -148,15 +91,13 @@ def get_trip_stops():
 @app.route('/get_trip_shapes', methods=['GET'])
 def get_trip_shapes():
     trip_id = request.args.get('trip_id')
-
-    trip = session.query(Trip).filter(Trip.trip_id == trip_id).first()
+    trip = test_trip(trip_id)
 
     if trip is None:
         response = Response(status=400)
         return response
 
-    shapes_result = session.query(Shape).filter(Shape.shape_id == trip.shape_id).all()
-    shapes = [i.to_dict() for i in shapes_result]
+    shapes = query_trip_shapes(trip)
 
     response = Response(response=json.dumps(shapes), status=200, mimetype='application/json')
     return response
@@ -165,18 +106,13 @@ def get_trip_shapes():
 @app.route('/get_trip_stops_coordinates', methods=['GET'])
 def get_trip_stops_coordinates():
     trip_id = request.args.get('trip_id')
-
-    trip = session.query(Trip).filter(Trip.trip_id == trip_id).first()
+    trip = test_trip(trip_id)
 
     if trip is None:
         response = Response(status=400)
         return response
 
-    trip_stops_coordinates = []
-    for i in trip.stop_times:
-        if i.stop.stop_id != trip.start_stop.stop_id and i.stop.stop_id != trip.end_stop.stop_id:
-            trip_stops_coordinates.append(
-                {'stop_name': i.stop.stop_name, 'stop_lat': str(i.stop.stop_lat), 'stop_lon': str(i.stop.stop_lon)})
+    trip_stops_coordinates = query_trip_stops_coordinates(trip)
 
     response = Response(response=json.dumps(trip_stops_coordinates), status=200, mimetype='application/json')
     return response
@@ -185,18 +121,13 @@ def get_trip_stops_coordinates():
 @app.route('/get_trip_terminals_coordinates', methods=['GET'])
 def get_trip_terminals_coordinates():
     trip_id = request.args.get('trip_id')
-
-    trip = session.query(Trip).filter(Trip.trip_id == trip_id).first()
+    trip = test_trip(trip_id)
 
     if trip is None:
         response = Response(status=400)
         return response
 
-    trip_terminals_coordinates = [
-        {'stop_name': trip.start_stop.stop_name, 'stop_lat': str(trip.start_stop.stop_lat),
-         'stop_lon': str(trip.start_stop.stop_lon)},
-        {'stop_name': trip.end_stop.stop_name, 'stop_lat': str(trip.end_stop.stop_lat),
-         'stop_lon': str(trip.end_stop.stop_lon)}]
+    trip_terminals_coordinates = query_trip_terminals_coordinates(trip)
 
     response = Response(response=json.dumps(trip_terminals_coordinates), status=200, mimetype='application/json')
     return response
@@ -204,8 +135,7 @@ def get_trip_terminals_coordinates():
 
 @app.route('/get_all_stops', methods=['GET'])
 def get_all_stops():
-    stops_result = session.query(Stop).group_by(Stop.stop_name).all()
-    stops = [i.to_dict() for i in stops_result]
+    stops = query_all_stops()
 
     response = Response(response=json.dumps(stops), status=200, mimetype='application/json')
     return response
@@ -215,9 +145,9 @@ def get_all_stops():
 def plan_trip():
     request_data = request.json
     graph = generate_graph()
-    log.debug(request_data['from'])
     path, cost = dijkstra(graph, {'name': request_data['from'], 'route': None}, request_data['to'], visited=[],
                           distances={}, predecessors={})
+
     response = Response(response=json.dumps(path), status=200, mimetype='application/json')
     return response
 
