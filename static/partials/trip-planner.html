@@ -1,6 +1,6 @@
-<h1 class="page-header">Útvonaltervezés</h1>
 <div class="col-md-6">
-    <div class="alert alert-warning" ng-if="emptyFields">Kérjük, töltse ki az üresen maradt mezőket!</div>
+    <h1 class="page-header">Útvonaltervezés</h1>
+    <div class="alert alert-warning" ng-if="emptyFields"><strong>Kérjük, töltse ki az üresen maradt mezőket!</strong></div>
     <div class="row">
         <div class="col-md-6">
             <div class="input-group input-group-unstyled">
@@ -18,42 +18,16 @@
             </div>
         </div>
     </div>
-
-    <div class="row row-margin-top">
-        <div class="col-md-4">
-            <div class="input-group input-group-unstyled">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-th-list"></i></span>
-                <select class="form-control" ng-model="selectedOption">
-                    <option>Indulás most</option>
-                    <option>Indulási idő választása</option>
-                    <option>Érkezési idő választása</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="input-group input-group-unstyled">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                <select class="form-control" ng-model="selectedDate" ng-options="date for date in dates"></select>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="input-group input-group-unstyled">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
-                <input type="time" class="form-control" ng-model="selectedTime"/>
-            </div>
-        </div>
-    </div>
     <div class="row row-margin-top">
         <button type="button" class="btn btn-default btn-block"
-                ng-click="planTrip(from, to, selectedOption, selectedDate, selectedTime)">Tervezés
+                ng-click="planTrip(from, to)">Tervezés
         </button>
     </div>
 </div>
-<div class="col-md-6">
-    <h3>Javasolt útvonal</h3>
-    <table class="table table-borderless">
+<div class="col-md-6" ng-show="wrongRequest != undefined">
+    <h1 class="page-header">Javasolt útvonal</h1>
+    <div class="alert alert-warning" ng-show="wrongRequest"><strong>Az Ön által megadott két megálló között nem sikerült útvonalat találni.</strong></div>
+    <table class="table table-borderless" ng-show="!wrongRequest">
         <tr ng-repeat="stop in plannedTrip">
             <td class="col-md-1"><span ng-show="plannedTrip[$index].route != plannedTrip[$index - 1].route"
                        class="label label-info">{{ stop.route }}</span></td>

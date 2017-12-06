@@ -147,11 +147,17 @@ def get_all_stops():
 def plan_trip():
     request_data = request.json
     graph = generate_graph()
-    path, cost = dijkstra(graph, {'name': request_data['from'], 'route': None}, request_data['to'], visited=[],
-                          distances={}, predecessors={})
-
-    response = Response(response=json.dumps(path), status=200, mimetype='application/json')
-    return response
+    if request_data['from'] == request_data['to']:
+        response = Response(status=400)
+        return response
+    try:
+        path, cost = dijkstra(graph, {'name': request_data['from'], 'route': None}, request_data['to'], visited=[],
+                              distances={}, predecessors={})
+        response = Response(response=json.dumps(path), status=200, mimetype='application/json')
+        return response
+    except TypeError:
+        response = Response(status=400)
+        return response
 
 
 if __name__ == '__main__':

@@ -196,45 +196,30 @@ app.controller("scheduleController", function ($scope, $http, $state, $statePara
 });
 
 app.controller("tripPlannerController", function ($scope, $http) {
-    $scope.emptyFields = false;
+        $scope.emptyFields = false;
 
-    $http.get("/get_all_stops").then(function (response) {
-        $scope.stops = response.data;
-    });
+        $http.get("/get_all_stops").then(function (response) {
+            $scope.stops = response.data;
+        });
 
-    $http.get("/get_dates").then(function (response) {
-        $scope.dates = response.data;
-    });
-
-    var date = new Date();
-    var dateString = date.getFullYear() + '-'
-        + ('0' + (date.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + date.getDate()).slice(-2);
-
-    //var timeString = date.getHours() + ':' + date.getMinutes();
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    $scope.selectedOption = "Indulás most";
-    $scope.selectedDate = dateString;
-    $scope.selectedTime = date;
-
-    $scope.planTrip = function (from, to, selectedOption, selectedDate, selectedTime) {
-        if (from != null && to != null) {
-            $scope.emptyFields = false;
-            $http.post("/plan_trip", {
-                'from': from,
-                'to': to,
-                'selectedOption': selectedOption,
-                'selectedDate': selectedDate,
-                'selectedTime': selectedTime
-            }).then(function (response) {
-                console.log(response);
-                $scope.plannedTrip = response.data;
-            });
-
-        }
-        else {
-            $scope.emptyFields = true;
+        $scope.planTrip = function (from, to, selectedOption, selectedDate, selectedTime) {
+            if (from != null && to != null) {
+                $scope.emptyFields = false;
+                $http.post("/plan_trip", {
+                    'from': from,
+                    'to': to
+                }).then(function (response) {
+                        $scope.plannedTrip = response.data;
+                        $scope.wrongRequest = false;
+                    },
+                    function () {
+                        $scope.wrongRequest = true;
+                    }
+                );
+            }
+            else {
+                $scope.emptyFields = true;
+            }
         }
     }
-});
+);
