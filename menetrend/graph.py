@@ -1,10 +1,11 @@
-from app import session
+from app import session, cache
 from gtfsdb.model.stop import Stop
 from gtfsdb.model.route import Route
 from gtfsdb.model.trip import Trip
 from datetime import datetime
 
 
+@cache.cached(timeout=86400, key_prefix='graph')
 def generate_graph():
     stops_name_result = session.query(Stop.stop_name).group_by(Stop.stop_name).all()
     graph = {}

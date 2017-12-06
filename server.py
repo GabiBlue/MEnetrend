@@ -22,6 +22,7 @@ def index():
 
 
 @app.route('/get_bus_routes', methods=['GET'])
+@cache.cached(timeout=86400)
 def get_bus_routes():
     bus_routes = query_routes_by_route_type(3)
 
@@ -30,6 +31,7 @@ def get_bus_routes():
 
 
 @app.route('/get_tram_routes', methods=['GET'])
+@cache.cached(timeout=86400)
 def get_tram_routes():
     tram_routes = query_routes_by_route_type(0)
 
